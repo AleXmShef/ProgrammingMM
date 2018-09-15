@@ -26,5 +26,6 @@ int main() {
         } else { cout << roots[i] << "  "; }
     }
 
+    // TODO: fix case infinite number of solutions only for some variables
     return 0;
 }
