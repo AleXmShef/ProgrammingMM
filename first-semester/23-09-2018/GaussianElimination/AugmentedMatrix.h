@@ -15,6 +15,10 @@ struct AugmentedMatrix {
     void printAll();
 
     unsigned int getSize();
+    unsigned int getCols();
+    unsigned int getRows();
+
+
 
     double **data;
 private:

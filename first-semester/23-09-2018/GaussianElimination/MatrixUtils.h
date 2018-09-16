@@ -8,7 +8,7 @@
 #include "AugmentedMatrix.h"
 
 struct MatrixUtils {
-    static double * GaussianElimination(AugmentedMatrix matrix);
+    static void GaussianElimination(AugmentedMatrix matrix);
 };
 
 

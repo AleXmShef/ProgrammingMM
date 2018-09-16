@@ -72,3 +72,11 @@ unsigned int AugmentedMatrix::getSize() {
     return size;
 }
 
+unsigned int AugmentedMatrix::getCols() {
+    return cols;
+}
+
+unsigned int AugmentedMatrix::getRows() {
+    return rows;
+}
+
