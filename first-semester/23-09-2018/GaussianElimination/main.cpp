@@ -6,17 +6,21 @@
 
 using namespace std;
 
-
 int main() {
-    cout << "Enter the number of linear equations:";
-    unsigned int n;
-    cin >> n;
-    AugmentedMatrix matrix(n);
-    matrix.print();
 
+    unsigned int cols, rows;
+    cout << "\nEnter number of linear equations: ";
+    cin >> rows;
+    cout << "\nEnter number of unknowns: ";
+    cin >> cols;
+    cout << "\nConsider a system of linear equation in form Ax=b";
+
+    AugmentedMatrix matrix(rows, cols);
+    matrix.printAll();
+    matrix.print();
     double *roots = MatrixUtils::GaussianElimination(matrix);
 
-    for (auto i = 0; i < n; ++i) {
+    for (auto i = 0; i < cols; ++i) {
         if (std::isinf(roots[i])) {
             cout << "No solutions.\t";
             break;
@@ -26,6 +30,6 @@ int main() {
         } else { cout << roots[i] << "  "; }
     }
 
-    // TODO: fix case infinite number of solutions only for some variables
+    // TODO: fix case with infinite number of solutions
     return 0;
 }

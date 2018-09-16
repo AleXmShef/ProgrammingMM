@@ -6,13 +6,13 @@
 #include <cmath>
 
 double *MatrixUtils::GaussianElimination(AugmentedMatrix matrix) {
-    unsigned int n = matrix.numberOfRows;
+    unsigned int n = matrix.getSize();
 
-    for (auto i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         // Search for maximum in this column
         double maxElement = std::abs(matrix.data[i][i]);
         int maxRow = i;
-        for (auto k = i + 1; k < n; k++) {
+        for (int k = i + 1; k < n; k++) {
             if (std::abs(matrix.data[k][i]) > maxElement) {
                 maxElement = std::abs(matrix.data[k][i]);
                 maxRow = k;
@@ -20,16 +20,16 @@ double *MatrixUtils::GaussianElimination(AugmentedMatrix matrix) {
         }
 
         // Swap maximum row with current row (column by column)
-        for (auto k = i; k < n + 1; k++) {
+        for (int k = i; k < n + 1; k++) {
             double tmp = matrix.data[maxRow][k];
             matrix.data[maxRow][k] = matrix.data[i][k];
             matrix.data[i][k] = tmp;
         }
 
         // Make all rows below this one 0 in current column
-        for (auto k = i + 1; k < n; k++) {
+        for (int k = i + 1; k < n; k++) {
             double c = -matrix.data[k][i] / matrix.data[i][i];
-            for (auto j = i; j < n + 1; j++) {
+            for (int j = i; j < n + 1; j++) {
                 if (i == j) {
                     matrix.data[k][j] = 0;
                 } else {

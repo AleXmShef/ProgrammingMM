@@ -6,14 +6,21 @@
 #define GAUSS_MATRIX_H
 
 struct AugmentedMatrix {
-    explicit AugmentedMatrix(unsigned int rows);
+    explicit AugmentedMatrix(unsigned int rows, unsigned int cols);
 
     ~AugmentedMatrix();
 
     void print();
 
+    void printAll();
+
+    unsigned int getSize();
+
     double **data;
-    unsigned int numberOfRows;
+private:
+    unsigned int size;
+    unsigned int rows;
+    unsigned int cols;
 };
 
 #endif //GAUSS_MATRIX_H
