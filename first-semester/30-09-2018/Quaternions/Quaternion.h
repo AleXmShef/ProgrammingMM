@@ -55,6 +55,10 @@ struct Quaternion {
 
     void print();
 
+<<<<<<< HEAD
+=======
+private:
+>>>>>>> Hotfix quaternions
     double x;
     double y;
     double z;
