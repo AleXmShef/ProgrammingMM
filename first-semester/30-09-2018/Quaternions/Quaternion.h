@@ -5,7 +5,6 @@
 #ifndef QUATERNIONS_QUATERNION_H
 #define QUATERNIONS_QUATERNION_H
 
-
 #include <cmath>
 
 struct Quaternion {
@@ -54,11 +53,26 @@ struct Quaternion {
 
     void invert();
 
+    void print();
+
     double x;
     double y;
     double z;
     double scal;
 };
 
+Quaternion invertedQuaternion(Quaternion const &a);
+
+Quaternion operator*(Quaternion const &a, double scale);
+
+Quaternion operator/(Quaternion const &a, double scale);
+
+Quaternion operator+(Quaternion const &a, Quaternion const &b);
+
+Quaternion operator-(Quaternion const &a, Quaternion const &b);
+
+Quaternion operator*(Quaternion const &a, Quaternion const &b);
+
+Quaternion operator/(Quaternion const &a, Quaternion const &b);
 
 #endif //QUATERNIONS_QUATERNION_H

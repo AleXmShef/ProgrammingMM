@@ -4,48 +4,41 @@
 
 #include "Quaternion.h"
 #include <cmath>
-
+#include <iostream>
 
 //region Additional functions
 
-Quaternion const &invertQuat(Quaternion const &a) {
-    return Quaternion(-a.x, -a.y, -a.z, -a.scal);
+Quaternion invertedQuaternion(Quaternion const &a) {
+    return Quaternion(-a.getX(), -a.getY(), -a.getZ(), -a.getScalar());
 }
 
-//region Overriding of binary  as functions
-
-Quaternion const &operator*(Quaternion const &a, double scale) {
+Quaternion operator*(Quaternion const &a, double scale) {
     return Quaternion(a.getX() * scale, a.getY() * scale, a.getZ() * scale, a.getScalar() * scale);
 }
 
-Quaternion const &operator/(Quaternion const &a, double scale) {
+Quaternion operator/(Quaternion const &a, double scale) {
     return Quaternion(a.getX() / scale, a.getY() / scale, a.getZ() / scale, a.getScalar() / scale);
 }
 
-Quaternion const &operator+(Quaternion const &a, Quaternion const &b) {
+Quaternion operator+(Quaternion const &a, Quaternion const &b) {
     return Quaternion(a.getX() + b.getX(), a.getY() + b.getY(), a.getZ() + b.getZ(), a.getScalar() + b.getScalar());
 }
 
-Quaternion const &operator-(Quaternion const &a, Quaternion const &b) {
+Quaternion operator-(Quaternion const &a, Quaternion const &b) {
     return Quaternion(a.getX() - b.getX(), a.getY() - b.getY(), a.getZ() - b.getZ(), a.getScalar() - b.getScalar());
 }
 
-Quaternion const &operator*(Quaternion const &a, Quaternion const &b) {
-
-    return Quaternion(a.scal * b.x + a.x * b.scal + a.y * b.z - a.z * b.y,
-                      a.scal * b.y - a.x * b.z + a.y * b.scal + a.z * b.x,
-                      a.scal * b.z + a.x * b.y - a.y * b.x + a.z * b.scal,
-                      a.scal * b.scal - a.x * b.x - a.y * b.y - a.z * b.z);
+Quaternion operator*(Quaternion const &a, Quaternion const &b) {
+    return Quaternion(a.getScalar() * b.getX() + a.getX() * b.getScalar() + a.getY() * b.getZ() - a.getZ() * b.getY(),
+                      a.getScalar() * b.getY() - a.getX() * b.getZ() + a.getY() * b.getScalar() + a.getZ() * b.getX(),
+                      a.getScalar() * b.getZ() + a.getX() * b.getY() - a.getY() * b.getX() + a.getZ() * b.getScalar(),
+                      a.getScalar() * b.getScalar() - a.getX() * b.getX() - a.getY() * b.getY() - a.getZ() * b.getZ());
 }
 
-Quaternion const &operator/(Quaternion const &a, Quaternion const &b) {
-    return a * invertQuat(b);
+Quaternion operator/(Quaternion const &a, Quaternion const &b) {
+    return a * invertedQuaternion(b);
 }
-
 //endregion
-
-//endregion
-
 
 Quaternion::Quaternion(double x, double y, double z, double scalar) : x(x), y(y), z(z), scal(scalar) {}
 
@@ -136,7 +129,6 @@ Quaternion &Quaternion::operator-=(Quaternion const &other) {
     return *this;
 }
 
-
 Quaternion &Quaternion::operator*=(Quaternion const &other) {
     double tx = x;
     double ty = y;
@@ -149,9 +141,8 @@ Quaternion &Quaternion::operator*=(Quaternion const &other) {
     return *this;
 }
 
-//TODO: understand wtf
 Quaternion &Quaternion::operator/=(Quaternion const &other) {
-    //this *= invertQuat(other);
+    *this *= invertedQuaternion(other);
     return *this;
 }
 
@@ -176,30 +167,6 @@ void Quaternion::invert() {
     z = -z;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void Quaternion::print() {
+    std::cout << "\nx: " << x << "  y: " << y << "  z: " << z << "  scalar: " << scal;
+}
