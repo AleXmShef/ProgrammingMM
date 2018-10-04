@@ -19,6 +19,10 @@ struct String {
 
     String &operator+=(String const &other);
 
+    String &operator=(String const & other);
+
+    String &operator=(char * cstr);
+
     String &operator+=(char * cstr);
 
 private:

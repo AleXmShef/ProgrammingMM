@@ -6,7 +6,7 @@
 #include <iostream>
 #include <cstring>
 
-String::String(char *cstr) : length(strlen(cstr)) {
+String::String(char *cstr) : length(static_cast<unsigned int>(strlen(cstr))) {
     data = new char[length];
     for (auto i = 0; i < length; ++i) {
         data[i] = cstr[i];
@@ -65,5 +65,22 @@ String &String::operator+=(char *cstr) {
     data = tdata;
     length = tlength;
 
+    return *this;
+}
+
+String &String::operator=(String const &other) {
+    delete [] data;
+    length = other.getLength();
+    data = other.data;
+    return *this;
+}
+
+String &String::operator=(char *cstr) {
+    delete [] data;
+    length = static_cast<unsigned int>(strlen(cstr));
+    data = new char[length];
+    for (auto i = 0; i < length; ++i) {
+        data[i] = cstr[i];
+    }
     return *this;
 }
