@@ -3,4 +3,4 @@ project(BigInteger)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(BigInteger main.cpp)
+add_executable(BigInteger main.cpp BigInteger.cpp BigInteger.h)

@@ -19,43 +19,22 @@ BigInteger::BigInteger(std::string str) {
         data.pop_back();
 }
 
+BigInteger::BigInteger(BigInteger &other) {
+    data = other.data;
+}
+
+BigInteger::BigInteger(int n) {
+
+}
+
 void BigInteger::print() {
     printf("%d", data.empty() ? 0 : data.back());
     for (int i = (int) data.size() - 2; i >= 0; --i)
         printf("%09d", data[i]);
 }
 
-BigInteger &BigInteger::operator=(BigInteger &number) {
-    if (this != &number) {
-        data = number.data;
-    }
-    return *this;
-}
-
-BigInteger BigInteger::operator+(BigInteger &number) {
-    BigInteger temp = *this;
-    int carry = 0;
-    for (size_t i = 0; i < std::max(temp.data.size(), number.data.size()) || carry; ++i) {
-        if (i == temp.data.size())
-            temp.data.push_back(0);
-        temp.data[i] += carry + (i < number.data.size() ? number.data[i] : 0);
-        carry = temp.data[i] >= base;
-        if (carry) temp.data[i] -= base;
-    }
-    return temp;
-}
-
-BigInteger BigInteger::operator-(BigInteger &number) {
-    BigInteger temp = *this;
-    int carry = 0;
-    for (size_t i = 0; i < number.data.size() || carry; ++i) {
-        temp.data[i] -= carry + (i < number.data.size() ? number.data[i] : 0);
-        carry = temp.data[i] < 0;
-        if (carry) temp.data[i] += base;
-    }
-    while (temp.data.size() > 1 && temp.data.back() == 0)
-        temp.data.pop_back();
-    return temp;
+int &BigInteger::operator[](unsigned int index) {
+    return data[index];
 }
 
 bool BigInteger::operator==(BigInteger &number) {
@@ -70,6 +49,69 @@ bool BigInteger::operator==(BigInteger &number) {
     return true;
 }
 
-BigInteger::BigInteger(BigInteger &other) {
-    data = other.data;
+BigInteger &BigInteger::operator=(BigInteger &number) {
+    if (this != &number) {
+        data = number.data;
+    }
+    return *this;
+}
+
+BigInteger BigInteger::operator+=(BigInteger &number) {
+    int carry = 0;
+    for (size_t i = 0; i < std::max(data.size(), number.data.size()) || carry; ++i) {
+        if (i == data.size())
+            data.push_back(0);
+        data[i] += carry + (i < number.data.size() ? number.data[i] : 0);
+        carry = data[i] >= base;
+        if (carry) data[i] -= base;
+    }
+    return *this;
+}
+
+BigInteger BigInteger::operator-=(BigInteger &number) {
+    int carry = 0;
+    for (size_t i = 0; i < number.data.size() || carry; ++i) {
+        data[i] -= carry + (i < number.data.size() ? number.data[i] : 0);
+        carry = data[i] < 0;
+        if (carry) data[i] += base;
+    }
+    while (data.size() > 1 && data.back() == 0)
+        data.pop_back();
+    return *this;
+}
+
+BigInteger BigInteger::operator*=(BigInteger &number) {
+
+    return *this;
+}
+
+BigInteger operator+(BigInteger &a, BigInteger &b) {
+    BigInteger temp = a;
+    int carry = 0;
+    for (size_t i = 0; i < std::max(temp.data.size(), b.data.size()) || carry; ++i) {
+        if (i == temp.data.size())
+            temp.data.push_back(0);
+        temp.data[i] += carry + (i < b.data.size() ? b.data[i] : 0);
+        carry = temp.data[i] >= base;
+        if (carry) temp.data[i] -= base;
+    }
+    return temp;
+}
+
+BigInteger operator-(BigInteger &a, BigInteger &b) {
+    BigInteger temp = a;
+    int carry = 0;
+    for (size_t i = 0; i < b.data.size() || carry; ++i) {
+        temp.data[i] -= carry + (i < b.data.size() ? b.data[i] : 0);
+        carry = temp.data[i] < 0;
+        if (carry) temp.data[i] += base;
+    }
+    while (temp.data.size() > 1 && temp.data.back() == 0)
+        temp.data.pop_back();
+    return temp;
+}
+
+BigInteger operator*(BigInteger &a, BigInteger &b) {
+
+    return a;
 }
