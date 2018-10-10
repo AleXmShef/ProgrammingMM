@@ -8,36 +8,44 @@
 #include <vector>
 #include <string>
 
-const int base = 1000 * 1000 * 1000;
+const int base = 10;
+const int lgBase = 1;
 
 struct BigInteger {
-    BigInteger(BigInteger &other);
+
+    BigInteger();
+
+    BigInteger(BigInteger const &other);
 
     explicit BigInteger(std::string str);
 
-    explicit BigInteger(int n = 0);
+    explicit BigInteger(long long n);
 
-    void print();
+    explicit BigInteger(std::vector<char> vec);
 
-    int &operator[](unsigned int index);
+    void print() const;
 
-    bool operator==(BigInteger &number);
+    char operator[](unsigned int index) const;
 
-    BigInteger &operator=(BigInteger &number);
+    bool operator==(BigInteger const &number) const;
 
-    BigInteger operator+=(BigInteger &number);
+    BigInteger &operator=(BigInteger const &number);
 
-    BigInteger operator-=(BigInteger &number);
+    BigInteger &operator+=(BigInteger const &number);
 
-    BigInteger operator*=(BigInteger &number);
+    BigInteger &operator-=(BigInteger const &number);
 
-    std::vector<int> data;
+    BigInteger &operator*=(BigInteger const &number);
+
+    std::vector<char> data;
 };
 
-BigInteger operator+(BigInteger &a, BigInteger &b);
+BigInteger &operator+(BigInteger const &a, BigInteger const &b);
 
-BigInteger operator-(BigInteger &a, BigInteger &b);
+BigInteger &operator-(BigInteger const &a, BigInteger const &b);
 
-BigInteger operator*(BigInteger &a, BigInteger &b);
+BigInteger &operator*(BigInteger const &a, BigInteger const &b);
+
+BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b);
 
 #endif //BIGINTEGER_H

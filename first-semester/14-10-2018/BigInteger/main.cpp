@@ -1,9 +1,14 @@
 #include <iostream>
 #include "BigInteger.h"
 
+using namespace std;
 int main() {
-    BigInteger a("1122334455667788991010");
-    a.print();
-    std::cout<<std::endl<<a[0]<<std::endl<<a[1]<<std::endl<<a[2];
+    BigInteger a(123456789);
+    BigInteger b(2);
+    BigInteger c;
+    c = a*b;
+    c.print();
+    c *= b;
+    c.print();
     return 0;
 }
