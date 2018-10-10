@@ -8,9 +8,6 @@
 #include <vector>
 #include <string>
 
-const int base = 10;
-const int lgBase = 1;
-
 struct BigInteger {
 
     BigInteger();

@@ -5,57 +5,68 @@
 #include "BigInteger.h"
 #include <iostream>
 #include <algorithm>
-#include <string>
-
-BigInteger::BigInteger(std::string str) {
-    for (int i = (int) str.length(); i > 0; i -= lgBase)
-        if (i < lgBase) {
-            int temp = atoi(str.substr(0, i).c_str());
-            data.push_back(char(temp));
-        } else {
-            int temp = atoi(str.substr(i - lgBase, lgBase).c_str());
-            data.push_back(char(temp));
-        }
-    normalize();
-}
 
 BigInteger::BigInteger(BigInteger const &other) {
     data = other.data;
 }
 
-BigInteger::BigInteger(long long n) {
-    std::string str = std::to_string(n);
-    for (int i = (int) str.length(); i > 0; i -= lgBase)
-        if (i < lgBase) {
-            int temp = atoi(str.substr(0, i).c_str());
-            data.push_back(char(temp));
-        } else {
-            int temp = atoi(str.substr(i - lgBase, lgBase).c_str());
-            data.push_back(char(temp));
+BigInteger::BigInteger(std::vector<char> vec) {
+    if (vec.empty()) {
+        data.push_back(0);
+    } else {
+        data = vec;
+    }
+}
+
+BigInteger::BigInteger(std::string str) {
+    if (str.empty()) {
+        data.push_back(0);
+    } else {
+        for (int i = (int) str.length() - 1; i >= 0; --i) {
+            data.push_back(str[i] - 48);
         }
+    }
     normalize();
 }
 
-BigInteger::BigInteger(std::vector<char> vec) {
-    data = vec;
+BigInteger::BigInteger(long long n) {
+    if (!n) {
+        data.push_back(0);
+    } else {
+        std::string str = std::to_string(n);
+        for (int i = (int) str.length() - 1; i >= 0; --i) {
+            data.push_back(str[i] - 48);
+        }
+    }
+    normalize();
 }
 
 BigInteger::BigInteger() = default;
 
 void BigInteger::print() const {
     std::cout << std::endl;
-    printf("%d", data.empty() ? 0 : data.back());
-    for (int i = (int) data.size() - 2; i >= 0; --i) {
-        printf(("%0" + std::to_string(lgBase) + "d").c_str(), data[i]);
+    if (data.empty()) {
+        std::cout << 0;
+    } else {
+        for (int i = (int) data.size() - 1; i >= 0; --i) {
+            std::cout << char(data[i] + 48);
+        }
     }
 }
 
 void BigInteger::normalize() {
-    while (data.size() > 1 && data.back() == 0)
-        data.pop_back();
+    if (data.empty()) {
+        data.push_back(0);
+    } else {
+        while (data.size() > 1 && data.back() == 0)
+            data.pop_back();
+    }
 }
 
 bool BigInteger::operator==(BigInteger const &other) const {
+    if (data.empty() || other.data.empty()) {
+        return false;
+    }
     if (data.size() != other.data.size()) {
         return false;
     }
@@ -71,28 +82,32 @@ BigInteger &BigInteger::operator=(BigInteger const &other) {
     if (this != &other) {
         data = other.data;
     }
+    normalize();
     return *this;
 }
 
 BigInteger &BigInteger::operator+=(BigInteger const &other) {
     int carry = 0;
-    for (size_t i = 0; i < std::max(data.size(), other.data.size()) || carry; ++i) {
-        if (i == data.size())
+    for (auto i = 0; i < std::max(data.size(), other.data.size()) || carry; ++i) {
+        if (i == data.size()) {
             data.push_back(0);
+        }
         data[i] += carry + (i < other.data.size() ? other.data[i] : 0);
-        carry = data[i] >= base;
-        if (carry) data[i] -= base;
+        carry = data[i] >= 10;
+        if (carry) {
+            data[i] -= 10;
+        }
     }
+    normalize();
     return *this;
 }
 
 BigInteger &BigInteger::operator-=(BigInteger const &other) {
-    normalize();
     int carry = 0;
     for (size_t i = 0; i < other.data.size() || carry; ++i) {
         data[i] -= carry + (i < other.data.size() ? other.data[i] : 0);
         carry = data[i] < 0;
-        if (carry) data[i] += base;
+        if (carry) data[i] += 10;
     }
     normalize();
     return *this;
@@ -105,8 +120,8 @@ BigInteger &BigInteger::operator*=(BigInteger const &other) {
         for (int j = 0, carry = 0; j < (int) other.data.size() || carry; ++j) {
             long long cur =
                     temp.data[i + j] + data[i] * 1ll * (j < (int) other.data.size() ? other.data[j] : 0) + carry;
-            temp.data[i + j] = char(cur % base);
-            carry = int(cur / base);
+            temp.data[i + j] = char(cur % 10);
+            carry = int(cur / 10);
         }
     }
     temp.normalize();
@@ -117,39 +132,46 @@ BigInteger &BigInteger::operator*=(BigInteger const &other) {
 BigInteger operator+(BigInteger const &a, BigInteger const &b) {
     BigInteger temp = a;
     int carry = 0;
-    for (size_t i = 0; i < std::max(temp.data.size(), b.data.size()) || carry; ++i) {
-        if (i == temp.data.size())
+    for (auto i = 0; i < std::max(temp.data.size(), b.data.size()) || carry; ++i) {
+        if (i == temp.data.size()) {
             temp.data.push_back(0);
+        }
         temp.data[i] += carry + (i < b.data.size() ? b.data[i] : 0);
-        carry = temp.data[i] >= base;
-        if (carry) temp.data[i] -= base;
+        carry = temp.data[i] >= 10;
+        if (carry) {
+            temp.data[i] -= 10;
+        }
     }
+    temp.normalize();
     return temp;
 }
 
 BigInteger operator-(BigInteger const &a, BigInteger const &b) {
     BigInteger temp = a;
     int carry = 0;
-    for (size_t i = 0; i < b.data.size() || carry; ++i) {
+    for (auto i = 0; i < b.data.size() || carry; ++i) {
         temp.data[i] -= carry + (i < b.data.size() ? b.data[i] : 0);
         carry = temp.data[i] < 0;
-        if (carry) temp.data[i] += base;
+        if (carry) {
+            temp.data[i] += 10;
+        }
     }
     temp.normalize();
     return temp;
 }
 
 BigInteger operator*(BigInteger const &a, BigInteger const &b) {
-    BigInteger c;
-    c.data = std::vector<char>(a.data.size() + b.data.size(), 0);
-    for (size_t i = 0; i < a.data.size(); ++i)
+    BigInteger temp;
+    temp.data = std::vector<char>(a.data.size() + b.data.size(), 0);
+    for (auto i = 0; i < a.data.size(); ++i) {
         for (int j = 0, carry = 0; j < (int) b.data.size() || carry; ++j) {
-            long long cur = c.data[i + j] + a.data[i] * 1ll * (j < (int) b.data.size() ? b.data[j] : 0) + carry;
-            c.data[i + j] = char(cur % base);
-            carry = int(cur / base);
+            long long cur = temp.data[i + j] + a.data[i] * 1ll * (j < (int) b.data.size() ? b.data[j] : 0) + carry;
+            temp.data[i + j] = char(cur % 10);
+            carry = int(cur / 10);
         }
-    c.normalize();
-    return c;
+    }
+    temp.normalize();
+    return temp;
 }
 
 BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b) {
@@ -166,7 +188,7 @@ BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b) {
     unsigned long maxLen = maxArg.data.size();
 
     //trivial case
-    if (minLen < 2 || maxLen < 2) {
+    if (minLen < 4 || maxLen < 4) {
         BigInteger res(a * b);
         res.normalize();
         return res;
@@ -176,17 +198,17 @@ BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b) {
 
     //split numbers into 3
     if (minLen <= halfLength) { // length of a is less then half of b
-        BigInteger b1;
+        BigInteger maxArg1;
         for (auto i = 0; i < halfLength; ++i) {
-            b1.data.push_back(b.data[i]);
+            maxArg1.data.push_back(maxArg.data[i]);
         }
-        BigInteger b2;
-        for (auto i = halfLength; i < b.data.size(); ++i) {
-            b2.data.push_back(b.data[i]);
+        BigInteger maxArg2;
+        for (auto i = halfLength; i < maxArg.data.size(); ++i) {
+            maxArg2.data.push_back(maxArg.data[i]);
         }
 
-        BigInteger q = karatsubaMultiplication(a, b1);
-        BigInteger p = karatsubaMultiplication(a, b2);
+        BigInteger q = karatsubaMultiplication(minArg, maxArg1);
+        BigInteger p = karatsubaMultiplication(minArg, maxArg2);
         for (auto i = 0; i < halfLength; ++i) { // ~ *10^(halfsize)
             p.data.insert(p.data.begin(), 0);
         }
@@ -196,30 +218,30 @@ BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b) {
     }
         //split numbers into 4
     else {
-        BigInteger b1;
+        BigInteger maxArg1;
         for (auto i = 0; i < halfLength; ++i) {
-            b1.data.push_back(b.data[i]);
+            maxArg1.data.push_back(maxArg.data[i]);
         }
-        BigInteger b2;
-        for (auto i = halfLength; i < b.data.size(); ++i) {
-            b2.data.push_back(b.data[i]);
+        BigInteger maxArg2;
+        for (auto i = halfLength; i < maxArg.data.size(); ++i) {
+            maxArg2.data.push_back(maxArg.data[i]);
         }
-        BigInteger a1;
+        BigInteger minArg1;
         for (auto i = 0; i < halfLength; ++i) {
-            a1.data.push_back(a.data[i]);
+            minArg1.data.push_back(minArg.data[i]);
         }
-        BigInteger a2;
-        for (auto i = halfLength; i < a.data.size(); ++i) {
-            a2.data.push_back(a.data[i]);
+        BigInteger minArg2;
+        for (auto i = halfLength; i < minArg.data.size(); ++i) {
+            minArg2.data.push_back(minArg.data[i]);
         }
-        BigInteger q = karatsubaMultiplication(a1, b1);
-        BigInteger p = karatsubaMultiplication(a2, b2);
-        BigInteger g = karatsubaMultiplication(a1 + a2, b1 + b2);
+        BigInteger q = karatsubaMultiplication(minArg1, maxArg1);
+        BigInteger p = karatsubaMultiplication(minArg2, maxArg2);
+        BigInteger g = karatsubaMultiplication(minArg1 + minArg2, maxArg1 + maxArg2);
         g -= (p + q);
-        for (auto i = 0; i < maxLen; ++i) { // ~ *10^(maxLength)
+        for (auto i = 0; i < halfLength * 2; ++i) { // * 10^(halfLength*2)
             p.data.insert(p.data.begin(), 0);
         }
-        for (auto i = 0; i < halfLength; ++i) { // ~ *10^(halfsize)
+        for (auto i = 0; i < halfLength; ++i) { // * 10^(halfLength)
             g.data.insert(g.data.begin(), 0);
         }
         BigInteger res(q + p + g);
