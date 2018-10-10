@@ -25,7 +25,7 @@ struct BigInteger {
 
     void print() const;
 
-    char operator[](unsigned int index) const;
+    void normalize();
 
     bool operator==(BigInteger const &number) const;
 
@@ -40,11 +40,11 @@ struct BigInteger {
     std::vector<char> data;
 };
 
-BigInteger &operator+(BigInteger const &a, BigInteger const &b);
+BigInteger operator+(BigInteger const &a, BigInteger const &b);
 
-BigInteger &operator-(BigInteger const &a, BigInteger const &b);
+BigInteger operator-(BigInteger const &a, BigInteger const &b);
 
-BigInteger &operator*(BigInteger const &a, BigInteger const &b);
+BigInteger operator*(BigInteger const &a, BigInteger const &b);
 
 BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b);
 

@@ -16,8 +16,7 @@ BigInteger::BigInteger(std::string str) {
             int temp = atoi(str.substr(i - lgBase, lgBase).c_str());
             data.push_back(char(temp));
         }
-    while (data.size() > 1 && data.back() == 0)
-        data.pop_back();
+    normalize();
 }
 
 BigInteger::BigInteger(BigInteger const &other) {
@@ -34,8 +33,7 @@ BigInteger::BigInteger(long long n) {
             int temp = atoi(str.substr(i - lgBase, lgBase).c_str());
             data.push_back(char(temp));
         }
-    while (data.size() > 1 && data.back() == 0)
-        data.pop_back();
+    normalize();
 }
 
 BigInteger::BigInteger(std::vector<char> vec) {
@@ -44,7 +42,7 @@ BigInteger::BigInteger(std::vector<char> vec) {
 
 BigInteger::BigInteger() = default;
 
-void BigInteger::print() const{
+void BigInteger::print() const {
     std::cout << std::endl;
     printf("%d", data.empty() ? 0 : data.back());
     for (int i = (int) data.size() - 2; i >= 0; --i) {
@@ -52,8 +50,9 @@ void BigInteger::print() const{
     }
 }
 
-char BigInteger::operator[](unsigned int index) const {
-    return data[index];
+void BigInteger::normalize() {
+    while (data.size() > 1 && data.back() == 0)
+        data.pop_back();
 }
 
 bool BigInteger::operator==(BigInteger const &other) const {
@@ -88,14 +87,14 @@ BigInteger &BigInteger::operator+=(BigInteger const &other) {
 }
 
 BigInteger &BigInteger::operator-=(BigInteger const &other) {
+    normalize();
     int carry = 0;
     for (size_t i = 0; i < other.data.size() || carry; ++i) {
         data[i] -= carry + (i < other.data.size() ? other.data[i] : 0);
         carry = data[i] < 0;
         if (carry) data[i] += base;
     }
-    while (data.size() > 1 && data.back() == 0)
-        data.pop_back();
+    normalize();
     return *this;
 }
 
@@ -110,14 +109,12 @@ BigInteger &BigInteger::operator*=(BigInteger const &other) {
             carry = int(cur / base);
         }
     }
-    while (temp.data.size() > 1 && temp.data.back() == 0) {
-        temp.data.pop_back();
-    }
+    temp.normalize();
     *this = temp;
     return *this;
 }
 
-BigInteger &operator+(BigInteger const &a, BigInteger const &b) {
+BigInteger operator+(BigInteger const &a, BigInteger const &b) {
     BigInteger temp = a;
     int carry = 0;
     for (size_t i = 0; i < std::max(temp.data.size(), b.data.size()) || carry; ++i) {
@@ -130,7 +127,7 @@ BigInteger &operator+(BigInteger const &a, BigInteger const &b) {
     return temp;
 }
 
-BigInteger &operator-(BigInteger const &a, BigInteger const &b) {
+BigInteger operator-(BigInteger const &a, BigInteger const &b) {
     BigInteger temp = a;
     int carry = 0;
     for (size_t i = 0; i < b.data.size() || carry; ++i) {
@@ -138,12 +135,11 @@ BigInteger &operator-(BigInteger const &a, BigInteger const &b) {
         carry = temp.data[i] < 0;
         if (carry) temp.data[i] += base;
     }
-    while (temp.data.size() > 1 && temp.data.back() == 0)
-        temp.data.pop_back();
+    temp.normalize();
     return temp;
 }
 
-BigInteger &operator*(BigInteger const &a, BigInteger const &b) {
+BigInteger operator*(BigInteger const &a, BigInteger const &b) {
     BigInteger c;
     c.data = std::vector<char>(a.data.size() + b.data.size(), 0);
     for (size_t i = 0; i < a.data.size(); ++i)
@@ -152,28 +148,34 @@ BigInteger &operator*(BigInteger const &a, BigInteger const &b) {
             c.data[i + j] = char(cur % base);
             carry = int(cur / base);
         }
-    while (c.data.size() > 1 && c.data.back() == 0)
-        c.data.pop_back();
+    c.normalize();
     return c;
 }
 
-BigInteger const &karatsubaMultiplication(BigInteger &a, BigInteger &b) {
+BigInteger karatsubaMultiplication(BigInteger const &a, BigInteger const &b) {
+    BigInteger maxArg;
+    BigInteger minArg;
     if (a.data.size() > b.data.size()) {
-        BigInteger temp = a;
-        a = b;
-        b = temp;
-    } // now b >= a
-    unsigned long aLength = a.data.size();
-    unsigned long bLength = b.data.size(); //maximal length
-    if (aLength < 2 || bLength < 2) {
-        return a * b;
+        maxArg = a;
+        minArg = b;
+    } else {
+        maxArg = b;
+        minArg = a;
+    }
+    unsigned long minLen = minArg.data.size();
+    unsigned long maxLen = maxArg.data.size();
+
+    //trivial case
+    if (minLen < 2 || maxLen < 2) {
+        BigInteger res(a * b);
+        res.normalize();
+        return res;
     }
 
-    unsigned long halfLength = (bLength % 2 == 0 ? bLength / 2 : (bLength + 1) / 2);
+    unsigned long halfLength = (maxLen % 2 == 0 ? maxLen / 2 : (maxLen + 1) / 2);
 
-    //split numbers a and b
-
-    if (aLength <= halfLength) { // length of a is less then half of b
+    //split numbers into 3
+    if (minLen <= halfLength) { // length of a is less then half of b
         BigInteger b1;
         for (auto i = 0; i < halfLength; ++i) {
             b1.data.push_back(b.data[i]);
@@ -184,12 +186,16 @@ BigInteger const &karatsubaMultiplication(BigInteger &a, BigInteger &b) {
         }
 
         BigInteger q = karatsubaMultiplication(a, b1);
-        BigInteger p = (a, b2);
+        BigInteger p = karatsubaMultiplication(a, b2);
         for (auto i = 0; i < halfLength; ++i) { // ~ *10^(halfsize)
             p.data.insert(p.data.begin(), 0);
         }
-        return q + p;
-    } else {
+        BigInteger res(q + p);
+        res.normalize();
+        return res;
+    }
+        //split numbers into 4
+    else {
         BigInteger b1;
         for (auto i = 0; i < halfLength; ++i) {
             b1.data.push_back(b.data[i]);
@@ -208,14 +214,16 @@ BigInteger const &karatsubaMultiplication(BigInteger &a, BigInteger &b) {
         }
         BigInteger q = karatsubaMultiplication(a1, b1);
         BigInteger p = karatsubaMultiplication(a2, b2);
-        BigInteger g = karatsubaMultiplication(a1 + a2, a1 + a2);
-        for (auto i = 0; i < bLength; ++i) { // ~ *10^(maxLength)
+        BigInteger g = karatsubaMultiplication(a1 + a2, b1 + b2);
+        g -= (p + q);
+        for (auto i = 0; i < maxLen; ++i) { // ~ *10^(maxLength)
             p.data.insert(p.data.begin(), 0);
         }
-        g -= (p + q);
         for (auto i = 0; i < halfLength; ++i) { // ~ *10^(halfsize)
             g.data.insert(g.data.begin(), 0);
         }
-        return q + p + g;
+        BigInteger res(q + p + g);
+        res.normalize();
+        return res;
     }
 }
