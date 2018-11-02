@@ -22,14 +22,7 @@ int main() {
          }
     );
 
-    for (auto i = 0; i < segments.size(); ++i) {
-        cout << segments[i].begining << " " << segments[i].ending << endl;
-    }
-
-
     int ans = 1;
-
-
     for (auto i = 1; i < segments.size(); ++i) {
         if (segments[i - 1].ending > segments[i].begining) {
             segments.erase(segments.begin() + i);
