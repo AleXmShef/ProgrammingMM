@@ -1,0 +1,3 @@
+/media/yuna/HDD/ProgrammingMM/first-semester/28-10-2018/k-permutation/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/media/yuna/HDD/ProgrammingMM/first-semester/28-10-2018/k-permutation/cmake-build-debug/CMakeFiles/edit_cache.dir
+/media/yuna/HDD/ProgrammingMM/first-semester/28-10-2018/k-permutation/cmake-build-debug/CMakeFiles/k_permutation.dir
